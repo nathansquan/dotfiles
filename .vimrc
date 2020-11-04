@@ -1,6 +1,6 @@
 filetype plugin indent on
 
-syntax on
+syntax enable
 "this is a comment
 call plug#begin('~/.vim/plugged')
 Plug 'junegunn/seoul256.vim' " Color scheme
@@ -16,6 +16,7 @@ Plug 'reedes/vim-lexical' " Better spellcheck mappings
 Plug 'reedes/vim-litecorrect' " Better autocorrections
 Plug 'reedes/vim-textobj-sentence' " Treat sentences as text objects
 Plug 'reedes/vim-wordy' " Weasel words and passive voice
+Plug 'arcticicestudio/nord-vim'
 call plug#end()
 
 " Options
@@ -23,7 +24,8 @@ set encoding=utf-8
 set fileencodings=utf-8
 set textwidth=80
 set number "Line numbering
-colorscheme seoul256
+"colorscheme seoul256
+colorscheme nord
 set background=dark
 
 " Goyo remap
@@ -60,7 +62,8 @@ augroup pencil
 
 
 " vim-pandoc
-let g:pandoc#fileypes#handled = ["pandoc", "markdown"]
+" Requires packages: pandoc, citeproc, 
+let g:pandoc#filetypes#handled = ["pandoc", "markdown"]
 let g:pandoc#modules#disabled = ["folding"]
 "Allow vim-pandoc auto execute pandoc on writes
 let g:pandoc#command#autoexec_on_writes = 1
@@ -68,5 +71,5 @@ let g:pandoc#command#autoexec_command = "Pandoc! pdf"
 "bib options
 let g:pandoc#biblio#use_bibtool = 1
 let g:pandoc#completion#bib#mode = 'citeproc'
-"let g:pandoc#biblio#sources = 'g'
-let g:pandoc#biblio#bibs = ["Documents/Notes/global.bib"]
+let g:pandoc#biblio#sources = 'g'
+let g:pandoc#biblio#bibs = ["/home/nathan/Documents/Notes/global.bib"]

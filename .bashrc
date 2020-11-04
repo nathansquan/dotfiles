@@ -35,7 +35,7 @@ pdftotext "$1" - | grep -oP "\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)
 
 
 # Takes a pdf file name, finds the doi, creates a .md file with the same name as the pdf to take notes on
-notate () {
+notate_paper () {
 #!/bin/bash
 
 # Author: Conner McDaniel
@@ -91,6 +91,120 @@ check_file "$title"
 vim "$file_name"
 }
 
+
+# Takes a pdf file name, finds the doi, creates a .md file with the same name as the pdf to take notes on
+notate_book () {
+#!/bin/bash
+
+# Author: Conner McDaniel
+# https://github.com/connermcd/bin
+# MIT license
+
+set -e
+
+pdf="$1"
+doi="$(pdf2doi ${1})"
+bib=$(curl -s "http://api.crossref.org/works/$doi/transform/application/x-bibtex")
+title=$(echo "$bib" | sed -n '1p' | cut -d{ -f2 | sed 's/,//')
+file_name=
+
+make_file() {
+new_pdf="$(dirname $pdf)/$1.pdf"
+[[ ! -f "$new_pdf" ]] && mv "$pdf" "$new_pdf"
+bib=$(echo "$bib" | sed "1a\\\tpdf = {$new_pdf},")
+cat >"$file_name" <<EOF
+---
+title: $title Notes
+author: Nathan Quan
+csl: /home/nathan/.csl/
+---
+~~~.bib
+$bib
+~~~
+# Summary
+
+# Quotes and Data
+
+# Questions
+
+EOF
+}
+
+check_file() {
+    file="$HOME/Documents/Notes/Books/$1.md"
+    if [[ -f $file ]]; then
+        file_doi=$(jrep -o -E "doi = {[^}]*" $file | cut -d{ -f2)
+        if [[ "${file_doi,,}" =~ "${doi,,}" ]]; then
+            file_name="$file"
+        else
+            check_file "${1}+"
+        fi
+    else
+        file_name="$file"
+        make_file "$1"
+    fi
+}
+
+check_file "$title"
+vim "$file_name"
+}
+
+# Takes a pdf file name, finds the doi, creates a .md file with the same name as the pdf to take notes on
+notate_textbook () {
+#!/bin/bash
+
+# Author: Conner McDaniel
+# https://github.com/connermcd/bin
+# MIT license
+
+set -e
+
+pdf="$1"
+doi="$(pdf2doi ${1})"
+bib=$(curl -s "http://api.crossref.org/works/$doi/transform/application/x-bibtex")
+title=$(echo "$bib" | sed -n '1p' | cut -d{ -f2 | sed 's/,//')
+file_name=
+
+make_file() {
+new_pdf="$(dirname $pdf)/$1.pdf"
+[[ ! -f "$new_pdf" ]] && mv "$pdf" "$new_pdf"
+bib=$(echo "$bib" | sed "1a\\\tpdf = {$new_pdf},")
+cat >"$file_name" <<EOF
+---
+title: $title Notes
+author: Nathan Quan
+csl: /home/nathan/.csl/
+---
+~~~.bib
+$bib
+~~~
+# Summary
+
+# Quotes and Data
+
+# Questions
+
+EOF
+}
+
+check_file() {
+    file="$HOME/Documents/Notes/Textbooks/$1.md"
+    if [[ -f $file ]]; then
+        file_doi=$(jrep -o -E "doi = {[^}]*" $file | cut -d{ -f2)
+        if [[ "${file_doi,,}" =~ "${doi,,}" ]]; then
+            file_name="$file"
+        else
+            check_file "${1}+"
+        fi
+    else
+        file_name="$file"
+        make_file "$1"
+    fi
+}
+
+check_file "$title"
+vim "$file_name"
+}
 
 # Look for tags in the .bib file in the Notes dir and places them in the tags file. Also greps for any pdf with bibtex header in the .bib file
 notetags() {
